@@ -1,0 +1,1560 @@
+:root {
+    --color-background: white;
+    --color-on-background: black;
+    --color-background-hover: #eee;
+    --color-on-background-hover: black;
+    --section-nav-gradient: linear-gradient(135deg, #ffffff, #e4e4e4);
+    --page-gradient: linear-gradient(to bottom, #ffffff 0, transparent 85vh);
+    --page-gradient-base: #b8b8b8;
+    --section-nav-glow: 0 0 18px rgba(0, 0, 0, 0.18);
+    --list-panel-bg: #e2e2e2;
+    --card-bg: #e6e6e6;
+    --card-border: rgba(0, 0, 0, 0.14);
+    --color-primary: #ba000c;
+    --color-on-primary: white;
+    --header-gradient: linear-gradient(to bottom, #ba000c, #e2000f);
+    --color-error: #de0000;
+    --color-on-error: white;
+    --error-gradient: linear-gradient(to bottom, #ff2b2b, #c40000);
+    --form-border-gray: rgba(70, 70, 70, 0.55);
+}
+
+/* Fade suave ao trocar entre modo claro/escuro, em vez de uma troca instantânea. */
+*, *::before, *::after {
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, fill 0.3s ease, stroke 0.3s ease;
+}
+
+/* Overlay de carregamento entre páginas, com barra de progresso "falsa". */
+.page-loading-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+    color: black;
+}
+.page-loading-overlay.dark {
+    background-color: #1c1b1f;
+    color: white;
+}
+.page-loading-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+.page-loading-logo {
+    width: 56px;
+    height: 56px;
+    animation: page-loading-pulse 1.2s ease-in-out infinite;
+}
+.page-loading-track {
+    width: 220px;
+    height: 6px;
+    border-radius: 999px;
+    background-color: var(--color-background-hover);
+    overflow: hidden;
+}
+.page-loading-bar {
+    height: 100%;
+    background-color: var(--color-primary);
+    border-radius: 999px;
+    transition: width 0.15s ease;
+}
+.page-loading-percent {
+    font-family: "Lexend Deca", sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    opacity: 0.6;
+}
+@keyframes page-loading-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(0.94); }
+}
+.page-overlay-fade-enter-active,
+.page-overlay-fade-leave-active {
+    transition: opacity 0.25s ease;
+}
+.page-overlay-fade-enter-from,
+.page-overlay-fade-leave-to {
+    opacity: 0;
+}
+
+/* Fade suave ao trocar de aba dentro de uma mesma página (ex: Settings). */
+.tab-fade-enter-active,
+.tab-fade-leave-active {
+    transition: opacity 0.15s ease;
+}
+.tab-fade-enter-from,
+.tab-fade-leave-to {
+    opacity: 0;
+}
+
+/* Abertura do dropdown de categoria (List/Leaderboard): fade + leve deslize/escala. */
+.dropdown-fade-enter-active {
+    transition: opacity 0.16s ease, transform 0.16s ease;
+    transform-origin: top center;
+}
+.dropdown-fade-leave-active {
+    transition: opacity 0.12s ease, transform 0.12s ease;
+    transform-origin: top center;
+}
+.dropdown-fade-enter-from,
+.dropdown-fade-leave-to {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+}
+
+/* Contorno de foco padronizado (vermelho do site) em vez do azul padrão do navegador. */
+button:focus {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+button:focus:not(:focus-visible) {
+    outline: none;
+}
+
+main.dark,
+header.dark,
+body.dark {
+    color-scheme: dark;
+    --color-background: #1c1b1f;
+    --color-on-background: white;
+    --color-background-hover: #27262c;
+    --color-on-background-hover: white;
+    --section-nav-gradient: linear-gradient(135deg, #121115, #27262c);
+    --page-gradient: linear-gradient(to bottom, #2a2830 0, transparent 85vh);
+    --page-gradient-base: #020203;
+    --section-nav-glow: 0 0 20px rgba(0, 0, 0, 0.35);
+    --list-panel-bg: #19181c;
+    --card-bg: var(--color-background-hover);
+    --card-border: rgba(255, 255, 255, 0.06);
+    --color-primary: #ff0011;
+    --color-primary-disabled: #1f213c;
+    --header-gradient: linear-gradient(to bottom, #ff0011, #c40010);
+    --color-on-primary: white;
+    --color-error: #de0000;
+    --color-on-error: white;
+    --error-gradient: linear-gradient(to bottom, #ff2b2b, #a80000);
+    --form-border-gray: rgba(120, 120, 120, 0.6);
+}
+
+html,
+body {
+    height: 100%;
+    overflow-x: hidden;
+}
+
+body {
+    background-color: var(--page-gradient-base);
+    background-image: var(--page-gradient);
+    background-repeat: no-repeat;
+    min-height: 100vh;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+}
+
+header,
+main {
+    background-color: var(--color-background);
+    color: var(--color-on-background);
+    display: grid;
+    grid-template-columns: minmax(16rem, 1fr) minmax(16rem, 2fr) minmax(
+            16em,
+            1fr
+        );
+    column-gap: 2rem;
+    min-width: 0;
+}
+main {
+    background-color: transparent;
+}
+
+header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-inline: calc(25vw - 10rem);
+    height: 4rem;
+    flex-shrink: 0;
+    background-color: var(--color-primary);
+    background-image: var(--header-gradient);
+    border-radius: 0 0 16px 16px;
+    color: var(--color-on-primary);
+}
+@media screen and (min-width: 1366px) {
+    header {
+        display: grid;
+    }
+    .header__right {
+        grid-column: 3;
+        justify-self: end;
+    }
+}
+header .logo {
+    justify-self: end;
+    align-self: center;
+    display: flex;
+    align-items: flex-end;
+    gap: 1rem;
+}
+
+.logo-icon {
+    height: 1.75rem;
+    width: auto;
+}
+
+header .nav {
+    flex: 1;
+}
+
+main {
+    height: 0;
+    flex: 1;
+    display: grid;
+    grid-template-rows: minmax(0, 1fr);
+    column-gap: 2rem;
+}
+main > div {
+    overflow-y: auto;
+    width: 100%;
+}
+
+.spinner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    grid-column: span 3;
+    min-height: calc(100vh - 4rem);
+}
+
+input[type="checkbox"] {
+    height: 1.25rem;
+    width: 1.25rem;
+    cursor: pointer;
+    margin: 0;
+}
+
+/* Classic / Platformer list switcher tabs */
+.list-tabs {
+    display: flex;
+    gap: 1.5rem;
+    padding-inline: 1rem;
+    border-bottom: 1px solid var(--color-background-hover);
+    margin-bottom: 0.5rem;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+.list-tabs::-webkit-scrollbar {
+    display: none;
+}
+
+.list-tab {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.75rem 0.25rem;
+    color: var(--color-on-background-hover);
+    opacity: 0.6;
+    border-bottom: 3px solid transparent;
+    transition: opacity 0.15s ease, border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+.list-tab:hover {
+    opacity: 0.85;
+}
+
+.list-tab.active {
+    color: var(--color-on-background);
+    opacity: 1;
+    border-bottom-color: var(--color-primary);
+}
+
+.list-tab:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
+/* ── Player profile page ─────────────────────────────────────── */
+
+/*
+   CORRIGIDO: seletor restrito apenas à página do Player, usando :has()
+   para checar a presença de .player-profile-header (exclusivo dessa página).
+   Antes usava .page-list genérico, que vazava esse padding para Settings/Claim.
+*/
+.page-list .level-container:has(.player-profile-header) .level {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+/* Fallback para navegadores sem suporte a :has() */
+.player-page .level-container .level {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.player-profile-card {
+    background-color: var(--card-bg);
+    border: 1.5px solid var(--card-border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.player-profile-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.25rem;
+}
+
+.player-avatar-wrapper {
+    flex-shrink: 0;
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    border: 3px solid white;
+    outline: 3px solid black;
+    overflow: hidden;
+    background-color: var(--color-background-hover);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.player-avatar {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.player-avatar-placeholder {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--color-on-background);
+    opacity: 0.5;
+}
+
+.player-profile-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+.player-profile-info h1 {
+    text-align: center;
+}
+
+.player-socials {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.social-link {
+    display: inline-flex;
+    align-items: center;
+    color: var(--color-on-background);
+    opacity: 0.6;
+    text-decoration: none;
+    transition: opacity 0.15s ease;
+}
+
+.social-link:hover { opacity: 1; }
+.social-youtube:hover { color: #ff0000; }
+.social-twitter:hover { color: #1d9bf0; }
+.social-discord:hover { color: #5865f2; }
+
+.player-bio {
+    margin: 1rem 0 0;
+    opacity: 0.75;
+    line-height: 1.6;
+    font-size: 0.95rem;
+}
+
+.player-bio-empty {
+    opacity: 0.35;
+    font-style: italic;
+}
+
+/* Espaçamento maior só no desktop — no mobile o card já é mais compacto
+   e não deve ser afetado por essa mudança. */
+@media screen and (min-width: 861px) {
+    .player-profile-header {
+        gap: 1.75rem;
+    }
+    .player-profile-info {
+        gap: 0.85rem;
+    }
+    .player-bio {
+        margin-top: 1.5rem;
+        text-align: center;
+    }
+}
+
+/* Painel de estatísticas */
+.player-stat-block {
+    background-color: var(--color-background);
+    border: 1.5px solid var(--card-border);
+    border-radius: 14px;
+    padding: 1.25rem 1.5rem;
+}
+
+.player-stat-title {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    opacity: 0.5;
+    margin: 0 0 0.6rem;
+    font-weight: 600;
+}
+
+.player-stat-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.player-stat-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+}
+
+.stat-label {
+    opacity: 0.55;
+}
+
+.stat-value {
+    font-weight: 600;
+}
+
+/* Profile link styles (leaderboard) */
+.profile-link {
+    opacity: 0.4;
+    text-decoration: none;
+    color: var(--color-on-background);
+    transition: opacity 0.15s ease;
+    padding: 0 0.5rem;
+}
+
+.profile-link:hover { opacity: 1; }
+
+.profile-link-header {
+    text-decoration: none;
+    color: var(--color-on-background);
+    border-bottom: 2px solid transparent;
+    transition: border-color 0.15s ease;
+}
+
+.profile-link-header:hover {
+    border-bottom-color: var(--color-primary);
+}
+
+.page-login {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    grid-column: span 3;
+    padding: 2rem;
+    font-family: "Lexend Deca", sans-serif;
+}
+.page-login input,
+.page-login button {
+    font-family: inherit;
+}
+
+.login-card {
+    background-color: var(--color-background-hover);
+    border-radius: 12px;
+    padding: 2rem;
+    width: 100%;
+    max-width: 420px;
+}
+
+/* Abas com indicador deslizante (Login/Create Account, Current %/Showcase etc) */
+.slide-tabs {
+    position: relative;
+    display: flex;
+    border-bottom: 1px solid var(--card-border);
+}
+.slide-tab {
+    flex: 1;
+    text-align: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.75rem 0.35rem;
+    color: var(--color-on-background);
+    opacity: 0.6;
+    font-family: "Lexend Deca", sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    white-space: nowrap;
+    transition: opacity 0.15s ease;
+}
+.slide-tab:hover {
+    opacity: 0.85;
+}
+.slide-tab.active {
+    opacity: 1;
+}
+.slide-tab-indicator {
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 50%;
+    height: 3px;
+    background-color: var(--color-primary);
+    transition: transform 0.25s ease;
+}
+
+/* Altura + opacidade animadas ao trocar entre Login/Create Account/Forgot Password.
+   overflow é controlado via :style (hidden só durante a transição — em repouso
+   fica visible, senão corta o "leading trim" dos labels .type-title-sm). */
+.login-mode-body {
+    transition: height 0.3s ease, opacity 0.15s ease;
+}
+
+.login-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    margin-bottom: 1rem;
+}
+
+.login-input {
+    background-color: var(--card-bg);
+    color: var(--color-on-background);
+    border: 1.5px solid var(--card-border);
+    border-radius: 8px;
+    padding: 0.65rem 0.85rem;
+    font-size: 0.95rem;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.15s ease;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.login-input:focus {
+    border-color: var(--color-primary);
+}
+
+.login-btn {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: transparent;
+    background-image: var(--header-gradient);
+    color: var(--color-on-primary);
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    margin-top: 0.5rem;
+    box-shadow: 0 1px 0.5rem 0 rgba(0, 0, 0, 0.35);
+    transition: transform 100ms ease, opacity 0.15s ease;
+}
+
+.login-btn:hover:not(:disabled) {
+    opacity: 0.9;
+    transform: translateY(-2px);
+}
+
+.login-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.login-alert {
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+}
+
+.login-alert-error {
+    background-color: rgba(222, 0, 0, 0.15);
+    color: var(--color-error);
+    border: 1px solid var(--color-error);
+}
+
+.login-alert-success {
+    background-color: rgba(0, 180, 100, 0.15);
+    color: #00b464;
+    border: 1px solid #00b464;
+}
+/* ─────────────────────────────────────────────────────────────── */
+/* ── Nav profile popup ───────────────────────────────────────── */
+.nav-profile {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    border-radius: 8px;
+    transition: background-color 0.15s ease;
+}
+
+.nav-profile:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.nav-profile-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid white;
+    outline: 2px solid black;
+    overflow: hidden;
+    background-color: rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: white;
+}
+
+.nav-profile-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.nav-profile-name {
+    color: var(--color-on-primary);
+    font-size: 0.9rem;
+}
+
+.nav-profile-popup {
+    position: absolute;
+    top: calc(100% + 22px);
+    right: 0;
+    background-color: var(--page-gradient-base);
+    background-image: var(--page-gradient);
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    min-width: 160px;
+    padding: 0.4rem 0;
+    z-index: 1000;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    max-width: calc(100vw - 2rem);
+}
+@media screen and (min-width: 861px) {
+    .nav-profile-popup {
+        right: auto;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+}
+
+/* ─── Ajustes gerais pra telas estreitas (celular) ────────────── */
+@media screen and (max-width: 860px) {
+    header,
+    main {
+        grid-template-columns: 1fr;
+    }
+    main {
+        column-gap: 0;
+        height: auto;
+        flex: none;
+        padding-inline: 0.5rem;
+    }
+    main > div {
+        overflow-y: visible;
+        height: auto;
+    }
+    .nav-profile-name {
+        display: none;
+    }
+    .notifications-popup {
+        position: fixed !important;
+        top: 4.5rem !important;
+        left: 0.75rem !important;
+        right: 0.75rem !important;
+        width: auto !important;
+        max-width: none !important;
+    }
+
+    /* Página de perfil (Player) reaproveita as classes da List, mas tem um
+       padding fixo de desktop que precisa ser resetado no mobile. */
+    .page-list .level-container:has(.player-profile-header) .level,
+    .player-page .level-container .level {
+        padding-left: 0;
+        padding-right: 0;
+    }
+    .player-profile-header {
+        gap: 0.85rem;
+    }
+    .player-avatar-wrapper {
+        width: 56px;
+        height: 56px;
+    }
+    .player-avatar-placeholder {
+        font-size: 1.5rem;
+    }
+
+    /* Corrige o wrapper "grid-column: span 3" usado por Settings, Submit,
+       Manage Levels e as telas de admin — todas compartilham esse padrão. */
+    main.page-list > div[style^="grid-column: span 3"] {
+        grid-column: 1 !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        padding: 1.25rem 1rem !important;
+    }
+
+    /* A regra geral acima (main { height: auto; flex: none; }) tira do
+       .page-login o "espaço" que ele usava pra se centralizar verticalmente
+       (via align-items/justify-content: center), fazendo o card de login
+       ficar grudado perto do header em telas estreitas — mesmo ele
+       continuando centralizado normalmente em telas mais largas (tablets).
+       Devolvemos aqui só pra essa página, sem afetar as outras. */
+    .page-login {
+        flex: 1;
+        height: auto;
+        min-height: calc(100vh - 4rem);
+        padding: 1.25rem 1rem;
+    }
+}
+
+
+.nav-profile-popup-item {
+    display: block;
+    width: 100%;
+    padding: 0.6rem 1rem;
+    text-align: left;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--color-on-background);
+    text-decoration: none;
+    font-family: "Lexend Deca", sans-serif;
+    font-size: 0.9rem;
+    transition: background-color 0.1s ease;
+    box-sizing: border-box;
+}
+
+.nav-profile-popup-item:hover {
+    background-color: var(--color-background-hover);
+}
+
+.nav-profile-popup-divider {
+    height: 1px;
+    background-color: var(--color-background-hover);
+    margin: 0.3rem 0;
+}
+
+.nav-profile-popup-logout {
+    color: var(--color-error);
+}
+
+.nav-profile-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+}
+
+/* ── Forgot password button ──────────────────────────────────── */
+.login-forgot {
+    display: block;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--color-on-background);
+    opacity: 0.5;
+    font-size: 0.85rem;
+    margin-top: 0.75rem;
+    padding: 0;
+    text-align: center;
+    width: 100%;
+    transition: opacity 0.15s ease;
+}
+
+.login-forgot:hover {
+    opacity: 1;
+}
+/* ─────────────────────────────────────────────────────────────── */
+/* ── Claim page ──────────────────────────────────────────────── */
+.claim-list {
+    max-height: 320px;
+    overflow-y: auto;
+    border: 1.5px solid var(--card-border);
+    border-radius: 8px;
+    margin-top: 0.5rem;
+    background-color: var(--card-bg);
+}
+
+.claim-list-item {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 0.65rem 1rem;
+    background: none;
+    border: none;
+    border-bottom: 1px solid var(--card-border);
+    cursor: pointer;
+    color: var(--color-on-background);
+    font-size: 0.9rem;
+    font-family: inherit;
+    box-sizing: border-box;
+    transition: background-color 0.1s ease;
+}
+
+.claim-list-item:last-child {
+    border-bottom: none;
+}
+
+.claim-list-item:hover {
+    background-color: var(--color-background-hover);
+}
+
+.claim-list-item.selected {
+    background-color: transparent;
+    background-image: var(--header-gradient);
+    color: var(--color-on-primary);
+}
+
+/* ── Admin claims page ───────────────────────────────────────── */
+.claim-request-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: var(--card-bg);
+    background-image: linear-gradient(135deg, rgba(255, 0, 17, 0.08), transparent 60%);
+    border: 1.5px solid var(--card-border);
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 0.75rem;
+    gap: 1rem;
+    flex-wrap: wrap;
+    overflow-wrap: break-word;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+}
+.claim-request-card > div:first-child {
+    min-width: 0;
+    flex: 1 1 200px;
+}
+
+/* Sub-seções dentro de um claim-request-card em coluna (Level/Verification Suggestions):
+   "card dentro de card" — fundo levemente diferente do card externo + borda própria. */
+.suggestion-section {
+    width: 100%;
+    box-sizing: border-box;
+    background-color: var(--color-background);
+    border: 1.5px solid var(--card-border);
+    border-radius: 8px;
+    padding: 0.85rem 1rem;
+}
+/* ─────────────────────────────────────────────────────────────── */
+/* ── Avatar Cropper Modal ────────────────────────────────────── */
+.cropper-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+}
+
+.cropper-modal {
+    background-color: var(--color-background);
+    border-radius: 14px;
+    padding: 1.5rem;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+}
+
+.cropper-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.cropper-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+    color: var(--color-on-background);
+    opacity: 0.6;
+    padding: 0;
+}
+
+.cropper-close:hover {
+    opacity: 1;
+}
+
+.cropper-stage {
+    position: relative;
+    width: 280px;
+    height: 280px;
+    margin: 0 auto;
+    overflow: hidden;
+    border-radius: 12px;
+    background-color: #000;
+    cursor: grab;
+    user-select: none;
+    touch-action: none;
+}
+
+.cropper-stage:active {
+    cursor: grabbing;
+}
+
+.cropper-image {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    max-width: none;
+    width: 280px;
+    height: auto;
+    pointer-events: none;
+}
+
+.cropper-circle-mask {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(circle at center, transparent 0, transparent 140px, rgba(0,0,0,0.6) 140px);
+    border-radius: 12px;
+}
+
+.cropper-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 1.25rem 0;
+    padding: 0 0.5rem;
+}
+
+.cropper-zoom-icon {
+    opacity: 0.5;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+}
+
+.cropper-slider {
+    flex: 1;
+    accent-color: var(--color-primary);
+    cursor: pointer;
+}
+
+.cropper-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+/* ── ImageCropper (recorte livre, usado nas fotos de progress report) ── */
+.image-cropper-stage {
+    position: relative;
+    margin: 0 auto;
+    overflow: hidden;
+    border-radius: 8px;
+    background-color: #000;
+    user-select: none;
+    touch-action: none;
+}
+.image-cropper-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    display: block;
+}
+.image-cropper-shade {
+    position: absolute;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    pointer-events: none;
+}
+.image-cropper-box {
+    position: absolute;
+    border: 1.5px solid white;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.6);
+    cursor: move;
+}
+.image-cropper-handle {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background-color: white;
+    border: 1.5px solid var(--color-primary);
+}
+/* ══════════════════════════════════════════════════════════════
+   FIX: Settings sidebar fica fixa na posição (sticky),
+   independente do conteúdo da aba ativa.
+   Substitua o bloco ".settings-layout" existente no main.css por este.
+   ══════════════════════════════════════════════════════════════ */
+
+/* ══════════════════════════════════════════════════════════════
+   Settings page — cards, gradiente e fonte coerentes com o resto do site.
+   ══════════════════════════════════════════════════════════════ */
+
+.page-settings {
+    font-family: "Lexend Deca", sans-serif;
+}
+.page-settings input,
+.page-settings textarea,
+.page-settings button {
+    font-family: inherit;
+}
+
+.settings-layout {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 1.5rem;
+    align-items: start;
+    margin-top: 1.5rem;
+}
+
+.settings-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+
+    position: sticky;
+    top: 1.5rem;
+    box-sizing: border-box;
+    background-color: var(--card-bg);
+    background-image: linear-gradient(135deg, rgba(255, 0, 17, 0.08), transparent 60%);
+    border: 1.5px solid var(--card-border);
+    border-radius: 12px;
+    padding: 0.75rem;
+}
+
+.settings-tab {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    border-radius: 8px;
+    padding: 0.65rem 0.85rem;
+    cursor: pointer;
+    color: var(--color-on-background);
+    opacity: 0.65;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: opacity 0.15s ease, background-color 0.15s ease;
+}
+
+.settings-tab:hover {
+    opacity: 1;
+    background-color: var(--color-background-hover);
+}
+
+.settings-tab.active {
+    opacity: 1;
+    background-color: transparent;
+    background-image: var(--header-gradient);
+    color: var(--color-on-primary);
+}
+
+.settings-sidebar-divider {
+    height: 1px;
+    background-color: var(--card-border);
+    margin: 0.5rem 0;
+}
+
+.settings-tab-logout {
+    color: var(--color-error);
+    opacity: 0.8;
+}
+
+.settings-tab-logout:hover {
+    opacity: 1;
+    background-color: rgba(222, 0, 0, 0.1);
+}
+
+.settings-content {
+    min-width: 0;
+    min-height: 400px;
+    box-sizing: border-box;
+    background-color: var(--card-bg);
+    background-image: linear-gradient(135deg, rgba(255, 0, 17, 0.08), transparent 60%);
+    border: 1.5px solid var(--card-border);
+    border-radius: 12px;
+    padding: 1.75rem;
+}
+
+/* Container visual em volta do formulário do Manage Levels/Manage Verifications */
+.add-level-form-card {
+    box-sizing: border-box;
+    background-color: var(--card-bg);
+    background-image: linear-gradient(135deg, rgba(0, 0, 0, 0.5), transparent 60%);
+    border: 1.5px solid var(--form-border-gray);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-top: 1rem;
+}
+
+/* Linhas de Creators (Manage Levels) — botão de remover cada slot, e de adicionar um novo */
+.creator-slot-btn {
+    flex-shrink: 0;
+    align-self: stretch;
+    box-sizing: border-box;
+    width: 2.4rem;
+    border-radius: 8px;
+    border: 1.5px solid var(--form-border-gray);
+    background: none;
+    color: var(--color-on-background);
+    cursor: pointer;
+    font-size: 1.3rem;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.15s ease;
+}
+.creator-slot-btn:hover {
+    background-color: var(--color-background-hover);
+}
+.creator-add-btn {
+    align-self: center;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    background: none;
+    border: 1.5px dashed var(--form-border-gray);
+    border-radius: 8px;
+    padding: 0.55rem 0.9rem;
+    color: var(--color-on-background);
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-family: inherit;
+    transition: background-color 0.15s ease;
+}
+.creator-add-btn:hover {
+    background-color: var(--color-background-hover);
+}
+
+/* Botão "Remove" de cada record (modo Records do Manage Levels) */
+.record-remove-btn {
+    background-color: var(--color-error);
+    background-image: var(--error-gradient);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 0.35rem 0.7rem;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-family: inherit;
+    font-weight: 600;
+}
+
+@media screen and (max-width: 700px) {
+    .settings-layout {
+        grid-template-columns: 1fr;
+    }
+    .settings-sidebar {
+        flex-direction: row;
+        flex-wrap: wrap;
+        position: static;
+    }
+    .settings-content {
+        padding: 1.25rem;
+    }
+}
+
+/* ── My Videos (Settings): lista com scroll + popup de edição ──── */
+.video-entries-scroll {
+    max-height: 22rem;
+    overflow-y: auto;
+    border: 1.5px solid var(--card-border);
+    border-radius: 10px;
+    margin-top: 1rem;
+}
+.video-entry-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.85rem 1rem;
+    border-bottom: 1px solid var(--card-border);
+}
+.video-entry-row:last-child {
+    border-bottom: none;
+}
+.video-preview-box {
+    margin-top: 1rem;
+    aspect-ratio: 16 / 9;
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: var(--color-background-hover);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.video-preview-box iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+/* Fade individual de cada linha ao entrar/sair (busca e filtro mudando a lista,
+   ou aprovar/rejeitar um card). Mais lento e com movimento pra ficar bem visível. */
+.row-fade-enter-active,
+.row-fade-leave-active {
+    transition: opacity 0.4s ease, transform 0.4s ease;
+}
+.row-fade-enter-from,
+.row-fade-leave-to {
+    opacity: 0;
+    transform: translateY(-12px) scale(0.97);
+}
+.row-fade-leave-active {
+    position: relative;
+    z-index: 0;
+}
+
+/* Variante do row-fade usada nas linhas de Creators (Manage Levels) — a linha
+   que sai vira position:absolute imediatamente, liberando o espaço na hora
+   pra caixa em volta poder encolher em sincronia com o fade, em vez de esperar
+   a animação da linha terminar pra só então medir a altura nova. */
+.creator-row-fade-enter-active,
+.creator-row-fade-leave-active {
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.creator-row-fade-enter-from,
+.creator-row-fade-leave-to {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.97);
+}
+.creator-row-fade-leave-active {
+    position: absolute;
+    width: 100%;
+}
+
+/* Fade genérico pra qualquer bloco que expande/recolhe dentro de uma caixa com
+   altura animada (ex: campo Path) — mesma técnica do creator-row-fade acima:
+   o conteúdo que sai vira position:absolute na hora, liberando o espaço
+   imediatamente pra caixa em volta poder encolher em sincronia. */
+.collapse-fade-enter-active,
+.collapse-fade-leave-active {
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.collapse-fade-enter-from,
+.collapse-fade-leave-to {
+    opacity: 0;
+    transform: translateY(-6px);
+}
+.collapse-fade-leave-active {
+    position: absolute;
+    left: 0;
+    right: 0;
+}
+
+/* Fade mais visível (com deslize) pros avisos de erro/sucesso nas páginas admin
+   de aprovação (Level/Verification Suggestions, Submissions, Claims). */
+.alert-fade-enter-active,
+.alert-fade-leave-active {
+    transition: opacity 0.35s ease, transform 0.35s ease;
+}
+.alert-fade-enter-from,
+.alert-fade-leave-to {
+    opacity: 0;
+    transform: translateY(-10px);
+}
+
+/* ── Barra de busca + botão de filtros (List / Leaderboard / Verifications) ── */
+.search-filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1.25rem;
+}
+.search-filter-bar .search-input-wrapper {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+}
+.search-filter-bar .search-input-wrapper svg {
+    position: absolute;
+    left: 0.8rem;
+    opacity: 0.4;
+    pointer-events: none;
+}
+.search-filter-bar .search-input-wrapper input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.65rem 0.85rem 0.65rem 2.35rem;
+    background-color: var(--card-bg);
+    background-image: linear-gradient(135deg, rgba(255, 0, 17, 0.06), transparent 60%);
+    border: 1.5px solid var(--card-border);
+    border-radius: 8px;
+    color: var(--color-on-background);
+    font-family: inherit;
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.15s ease;
+}
+.search-filter-bar .search-input-wrapper input:focus {
+    border-color: var(--color-primary);
+}
+.search-filter-bar .search-input-wrapper input::placeholder {
+    color: var(--color-on-background);
+    opacity: 0.45;
+}
+.search-filter-bar .filters-btn {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    background-color: var(--color-background);
+    background-image: linear-gradient(135deg, rgba(255, 0, 17, 0.15), transparent 60%);
+    border: 1.5px solid rgba(0, 0, 0, 0.6);
+    border-radius: 8px;
+    padding: 0.65rem 0.9rem;
+    cursor: pointer;
+    color: inherit;
+    font-family: inherit;
+}
+.search-filter-bar .filters-btn .filter-count {
+    background-color: var(--color-primary);
+    color: white;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    min-width: 1.1rem;
+    height: 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 0.3rem;
+}
+@media screen and (max-width: 420px) {
+    .search-filter-bar .filters-btn span.type-label-lg {
+        display: none;
+    }
+}
+
+/* Botão "Suggest a Level" (List) — gradiente vermelho pra vermelho mais escuro */
+.suggest-level-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: 0.6rem;
+    padding: 0.75rem 1rem;
+    border: none;
+    border-radius: 8px;
+    background-image: var(--header-gradient);
+    color: white;
+    text-decoration: none;
+    box-shadow: 0 1px 0.5rem 0 rgba(0, 0, 0, 0.35);
+    transition: transform 100ms ease;
+    cursor: pointer;
+    font: inherit;
+}
+.suggest-level-btn:hover {
+    transform: translateY(-2px);
+}
+
+/* ── Verifications page ─────────────────────────────────────── */
+.verif-mobile-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background-color: var(--color-background-hover);
+    background-image: var(--section-nav-gradient);
+    box-shadow: var(--section-nav-glow);
+    border-radius: 6px;
+    margin: 1rem auto 1.25rem;
+    width: 100%;
+    max-width: 420px;
+    box-sizing: border-box;
+}
+.verif-mobile-nav span {
+    flex: 1;
+    text-align: center;
+}
+.verif-mobile-nav button {
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    display: flex;
+    flex-shrink: 0;
+}
+.verif-mobile-nav button:hover:not(:disabled) {
+    background-color: var(--color-background);
+}
+.verif-mobile-nav button:disabled {
+    opacity: 0.25;
+    cursor: default;
+}
+
+/* Deslize direcional no label do carrossel (List / Public Videos) —
+   a seta direita desliza da direita pra esquerda, a esquerda faz o inverso. */
+.carousel-fwd-enter-active,
+.carousel-fwd-leave-active,
+.carousel-back-enter-active,
+.carousel-back-leave-active {
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.carousel-fwd-enter-from {
+    opacity: 0;
+    transform: translateX(14px);
+}
+.carousel-fwd-leave-to {
+    opacity: 0;
+    transform: translateX(-14px);
+}
+.carousel-back-enter-from {
+    opacity: 0;
+    transform: translateX(-14px);
+}
+.carousel-back-leave-to {
+    opacity: 0;
+    transform: translateX(14px);
+}
+@media screen and (max-width: 860px) {
+    .verif-mobile-nav {
+        max-width: none;
+    }
+}
+
+/* Linha da engrenagem (admin) + dropdown de sub-abas (Set Verifier/Open Verification/Verified).
+   No mobile é um flex normal (engrenagem + dropdown ocupando o resto).
+   No desktop, só o dropdown é centralizado na página; a engrenagem "flutua"
+   grudada nele (não afeta a centralização). */
+.verif-subtab-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+@media screen and (min-width: 861px) {
+    .verif-subtab-row {
+        position: relative;
+        justify-content: center;
+    }
+    .verif-subtab-dropdown-wrap {
+        flex: none !important;
+        width: 100% !important;
+    }
+    .verif-subtab-gear {
+        position: absolute;
+        top: 50%;
+        left: calc(50% - 230px - 0.5rem);
+        transform: translate(-100%, -50%);
+    }
+}
+
+/* Título do pack (detalhe) — quando o nome é longo demais pra caber,
+   vira um slider horizontal em vez de quebrar linha/cortar. */
+.pack-name-scroll {
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 0.15em;
+}
+.pack-name-scroll::-webkit-scrollbar {
+    display: none;
+}
+.pack-name-scroll::before,
+.pack-name-scroll::after {
+    content: none;
+}
+
+/* Badge "New" — fases/packs/verificações/projetos adicionados recentemente. */
+.new-badge {
+    display: inline-block;
+    padding: 0.15rem 0.55rem;
+    border-radius: 999px;
+    background-color: #eab308;
+    border: 1px solid #fef9c3;
+    color: #ffffff;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    vertical-align: middle;
+    line-height: 1.4;
+    flex-shrink: 0;
+}
+
+/* Badge "Updated" — mesma fase, editada recentemente (não conta se ainda
+   está dentro do prazo do "New" — aí só mostra "New" mesmo). */
+.updated-badge {
+    display: inline-block;
+    padding: 0.15rem 0.55rem;
+    border-radius: 999px;
+    background-color: #60a5fa;
+    border: 1px solid #eff6ff;
+    color: #ffffff;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    vertical-align: middle;
+    line-height: 1.4;
+    flex-shrink: 0;
+}
+
+/* Nome da fase + badges na tabela principal — quando não cabe no card,
+   vira um slider horizontal em vez de estourar/cortar. */
+.level-name-scroll {
+    display: block;
+    flex: 1;
+    min-width: 0;
+    max-width: 100%;
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+.level-name-scroll::-webkit-scrollbar {
+    display: none;
+}
+.level-name-scroll::before,
+.level-name-scroll::after {
+    content: none;
+}
+
+/* Versão 2.5x maior dos badges New/Updated — usada no cabeçalho de detalhe
+   (ao lado do título grande), onde o tamanho normal fica pequeno demais. */
+.new-badge-lg,
+.updated-badge-lg {
+    padding: 0.2625rem 0.9625rem;
+    font-size: 1.1375rem;
+    border-width: 1.5px;
+}
