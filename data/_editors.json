@@ -1,0 +1,32 @@
+[
+    {
+        "role": "owner",
+        "name": "Sas4",
+        "link": "https://www.youtube.com/@Sas4trexs"
+    },
+    {
+        "role": "owner",
+        "name": "Shiori Khay",
+        "link": "https://www.youtube.com/@zCamael"
+    },
+    {
+        "role": "admin",
+        "name": "Marculi8",
+        "link": "https://www.youtube.com/@kidgeometry958"
+    },
+    {
+        "role": "helper",
+        "name": "List Helper",
+        "link": "https://www.youtube.com/@Prometheus_Alt"
+    },
+    {
+        "role": "trial",
+        "name": "Trial List Helper",
+        "link": "https://www.youtube.com/@Prometheus_Alt"
+    },
+    {
+        "role": "dev",
+        "name": "Shiori Khay",
+        "link": "https://www.youtube.com/@zCamael"
+    }
+]
