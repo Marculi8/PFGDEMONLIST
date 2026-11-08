@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Reborn GDPS Demonlist</title>
+        <link rel="icon" type="image/png" href="assets/rebicon.png">
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@500;700&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" type="text/css" href="/css/reset.css" />
+        <link rel="stylesheet" type="text/css" href="/css/typography.css" />
+        <link rel="stylesheet" type="text/css" href="/css/main.css" />
+        <link rel="stylesheet" type="text/css" href="/css/pages/list.css" />
+        <link rel="stylesheet" type="text/css" href="/css/pages/leaderboard.css" />
+        <link rel="stylesheet" type="text/css" href="/css/pages/roulette.css" />
+        <link rel="stylesheet" type="text/css" href="/css/components/nav.css" />
+        <link rel="stylesheet" type="text/css" href="/css/components/btn.css" />
+        <link rel="stylesheet" type="text/css" href="/css/components/tabs.css" />
+        <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+        <script src="https://unpkg.com/vue@3.2.31/dist/vue.global.js"></script>
+        <script src="https://unpkg.com/vue-router@4.0.14/dist/vue-router.global.prod.js"></script>
+        <script type="module" src="/js/main.js"></script>
+    </head>
+    <body id="app">
+        <header :class="{ dark: store.dark }">
+            <div class="logo">
+                <img src="/assets/reblogo.png" alt="RGDL" class="logo-icon">
+                <h2>RGDL</h2>
+                <p>v2.5.1</p>
+            </div>
+
+            <button class="nav__hamburger" @click.stop="store.mobileMenuOpen = !store.mobileMenuOpen" :aria-expanded="store.mobileMenuOpen" aria-label="Menu" :class="{ open: store.mobileMenuOpen }">
+                <span class="nav__hamburger-icon">
+                    <span class="nav__hamburger-bar"></span>
+                    <span class="nav__hamburger-bar"></span>
+                    <span class="nav__hamburger-bar"></span>
+                </span>
+            </button>
+
+            <nav class="nav" :class="{ 'mobile-open': store.mobileMenuOpen }">
+                <div class="nav__tabs-group">
+                    <div class="nav__tab" style="position: relative; cursor: pointer; flex-direction: column; align-items: stretch; padding: 0;" @click.stop="store.toggleListMenu()">
+                        <span class="type-label-lg" style="padding: 0.7rem 0.75rem; text-align: center;">List</span>
+
+                        <transition name="dropdown-fade">
+                        <div v-if="store.listMenuOpen" style="position: absolute; top: 100%; left: 0; right: 0; margin-top: 0.4rem; display: flex; flex-direction: column; gap: 0.25rem; background-color: var(--color-primary); background-image: var(--header-gradient); border: 1.5px solid rgba(0, 0, 0, 0.4); border-radius: 8px; padding: 0.25rem; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35); z-index: 20;">
+                            <router-link
+                                to="/"
+                                class="nav__tab"
+                                style="justify-content: center; background-color: rgba(0, 0, 0, 0.15);"
+                                @click.stop="store.listMenuOpen = false"
+                            ><span class="type-label-lg">Lists</span></router-link>
+                            <router-link
+                                to="/verifications"
+                                class="nav__tab"
+                                style="justify-content: center; background-color: rgba(0, 0, 0, 0.15);"
+                                @click.stop="store.listMenuOpen = false"
+                            ><span class="type-label-lg">Verifications</span></router-link>
+                            <router-link
+                                to="/projects"
+                                class="nav__tab"
+                                style="justify-content: center; background-color: rgba(0, 0, 0, 0.15);"
+                                @click.stop="store.listMenuOpen = false"
+                            ><span class="type-label-lg">Projects</span></router-link>
+                        </div>
+                        </transition>
+                    </div>
+                    <router-link class="nav__tab" to="/leaderboard">
+                        <span class="type-label-lg">Leaderboard</span>
+                    </router-link>
+                    <router-link class="nav__tab" to="/packs">
+                        <span class="type-label-lg">Packs</span>
+                    </router-link>
+                    <router-link class="nav__tab" to="/roulette">
+                        <span class="type-label-lg">Roulette</span>
+                    </router-link>
+                </div>
+                <div class="nav__actions">
+                    <button class="nav__icon" @click.prevent="store.toggleDark()">
+                        <img :src="store.dark ? '/assets/light.svg' : '/assets/dark.svg'" alt="" />
+                    </button>
+                    <a class="nav__icon" href="https://discord.gg/PsuvfWw8M4">
+                        <img src="/assets/discord.svg" alt="Discord Logo" />
+                    </a>
+
+                    <router-link class="nav__cta type-label-lg" to="/submit">
+                        Submit Record
+                    </router-link>
+                </div>
+            </nav>
+
+            <div class="header__right">
+                <!-- Sino de notificações -->
+                <div v-if="store.user" class="nav-profile" style="position: relative;" @click.stop="store.toggleNotifications()">
+                        <button class="nav__icon" style="position: relative;" title="Notifications">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
+                                <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                            </svg>
+                            <span
+                                v-if="store.unreadNotificationsCount > 0"
+                                style="position: absolute; top: -2px; right: -2px; background-color: #ff0011; color: #fff; border-radius: 999px; font-size: 0.65rem; min-width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; padding: 0 3px; font-weight: 700;"
+                            >{{ store.unreadNotificationsCount > 9 ? '9+' : store.unreadNotificationsCount }}</span>
+                        </button>
+
+                        <!-- Dropdown de notificações -->
+                        <transition name="tab-fade">
+                        <div
+                            v-if="store.notificationsOpen"
+                            class="nav-profile-popup notifications-popup"
+                            style="width: 320px; max-height: 400px; overflow-y: auto; color: var(--color-on-background); font-family: 'Lexend Deca', sans-serif;"
+                            @click.stop
+                        >
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0.75rem;">
+                                <span class="type-label-lg">Notifications</span>
+                                <div style="display: flex; gap: 0.75rem;">
+                                    <button
+                                        v-if="store.unreadNotificationsCount > 0"
+                                        @click="store.markAllNotificationsRead()"
+                                        style="background: none; border: none; color: inherit; opacity: 0.6; font-size: 0.8rem; font-family: 'Lexend Deca', sans-serif; cursor: pointer;"
+                                    >Mark all read</button>
+                                    <button
+                                        v-if="store.notifications.some(n => n.read)"
+                                        @click="store.clearReadNotifications()"
+                                        style="background: none; border: none; color: inherit; opacity: 0.6; font-size: 0.8rem; font-family: 'Lexend Deca', sans-serif; cursor: pointer;"
+                                    >Clear read</button>
+                                </div>
+                            </div>
+                            <div class="nav-profile-popup-divider"></div>
+
+                            <p v-if="store.notifications.length === 0" style="opacity: 0.5; padding: 1rem 0.75rem; margin: 0; font-size: 0.85rem; font-family: 'Lexend Deca', sans-serif;">
+                                No notifications yet.
+                            </p>
+
+                            <router-link
+                                v-for="n in store.notifications"
+                                :key="n.id"
+                                :to="n.link || '#'"
+                                class="nav-profile-popup-item"
+                                :style="{ opacity: n.read ? 0.55 : 1, whiteSpace: 'normal', lineHeight: '1.35' }"
+                                @click="store.markNotificationRead(n); store.notificationsOpen = false;"
+                            >
+                                <span v-if="!n.read" style="display: inline-block; width: 6px; height: 6px; border-radius: 999px; background-color: #ff0011; margin-right: 0.4rem;"></span>{{ n.message }}
+                            </router-link>
+                        </div>
+                        </transition>
+                    </div>
+
+                    <!-- Usuário logado: avatar + nome + popup -->
+                    <div v-if="store.user" class="nav-profile" @click.stop="store.toggleProfileMenu()">
+                        <div class="nav-profile-avatar">
+                            <img
+                                v-if="store.profile && store.profile.avatar"
+                                :src="store.profile.avatar"
+                                alt="avatar"
+                            >
+                            <span v-else>{{ store.profile ? store.profile.username.charAt(0).toUpperCase() : '?' }}</span>
+                        </div>
+                        <span class="nav-profile-name type-label-lg">
+                            {{ store.profile ? store.profile.username : '...' }}
+                        </span>
+
+                        <!-- Popup -->
+                        <transition name="tab-fade">
+                        <div class="nav-profile-popup" v-if="store.profileMenuOpen" @click.stop>
+                            <router-link
+                                v-if="store.profile"
+                                :to="'/player/' + (store.profile.list_name || store.profile.username)"
+                                class="nav-profile-popup-item"
+                                @click="store.profileMenuOpen = false"
+                            >View Profile</router-link>
+
+                            <router-link
+                                v-if="!store.profile || !store.profile.list_name"
+                                to="/claim"
+                                class="nav-profile-popup-item"
+                                @click="store.profileMenuOpen = false"
+                            >Claim Your Profile</router-link>
+
+                            <router-link
+                                v-if="store.profile && store.profile.role === 'admin'"
+                                to="/admin/claims"
+                                class="nav-profile-popup-item"
+                                @click="store.profileMenuOpen = false"
+                            >Manage Claims</router-link>
+
+                            <router-link
+                                v-if="store.profile && (store.profile.role === 'mod' || store.profile.role === 'admin')"
+                                to="/admin/submissions"
+                                class="nav-profile-popup-item"
+                                @click="store.profileMenuOpen = false"
+                            >Manage Submissions</router-link>
+
+                            <router-link
+                                v-if="store.profile && (store.profile.role === 'mod' || store.profile.role === 'admin')"
+                                to="/admin/level-suggestions"
+                                class="nav-profile-popup-item"
+                                @click="store.profileMenuOpen = false"
+                            >Level Suggestions</router-link>
+
+                            <router-link
+                                v-if="store.profile && (store.profile.role === 'mod' || store.profile.role === 'admin')"
+                                to="/admin/verification-suggestions"
+                                class="nav-profile-popup-item"
+                                @click="store.profileMenuOpen = false"
+                            >Verification Suggestions</router-link>
+
+                            <router-link
+                                v-if="store.profile && (store.profile.role === 'mod' || store.profile.role === 'admin')"
+                                to="/admin/project-suggestions"
+                                class="nav-profile-popup-item"
+                                @click="store.profileMenuOpen = false"
+                            >Project Suggestions</router-link>
+
+                            <router-link
+                                v-if="store.profile && (store.profile.role === 'mod' || store.profile.role === 'admin')"
+                                to="/admin/pack-suggestions"
+                                class="nav-profile-popup-item"
+                                @click="store.profileMenuOpen = false"
+                            >Pack Suggestions</router-link>
+
+                            <router-link
+                                to="/settings"
+                                class="nav-profile-popup-item"
+                                @click="store.profileMenuOpen = false"
+                            >Edit Profile</router-link>
+                            <div class="nav-profile-popup-divider"></div>
+                            <button
+                                class="nav-profile-popup-item nav-profile-popup-logout"
+                                @click="store.logout(); store.profileMenuOpen = false;"
+                            >Logout</button>
+                        </div>
+                        </transition>
+                    </div>
+
+                <!-- Não logado -->
+                <router-link v-else class="nav__cta type-label-lg" to="/login">
+                    Login
+                </router-link>
+            </div>
+        </header>
+
+        <!-- Overlay para fechar popup ao clicar fora -->
+        <div v-if="store.profileMenuOpen" class="nav-profile-overlay" @click="store.profileMenuOpen = false"></div>
+        <div v-if="store.notificationsOpen" class="nav-profile-overlay" @click="store.notificationsOpen = false"></div>
+        <div v-if="store.mobileMenuOpen" class="nav-profile-overlay" @click="store.mobileMenuOpen = false"></div>
+        <div v-if="store.listMenuOpen" class="nav-profile-overlay" @click="store.listMenuOpen = false"></div>
+
+        <router-view :class="{ dark: store.dark }"></router-view>
+
+        <!-- Overlay de carregamento entre páginas -->
+        <transition name="page-overlay-fade">
+            <div v-if="store.pageLoading" class="page-loading-overlay" :class="{ dark: store.dark }">
+                <div class="page-loading-box">
+                    <img src="/assets/reblogo.png" alt="" class="page-loading-logo">
+                    <div class="page-loading-track">
+                        <div class="page-loading-bar" :style="{ width: store.pageLoadProgress + '%' }"></div>
+                    </div>
+                    <span class="page-loading-percent">{{ Math.round(store.pageLoadProgress) }}%</span>
+                </div>
+            </div>
+        </transition>
+    </body>
+</html>
